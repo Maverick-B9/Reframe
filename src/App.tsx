@@ -152,10 +152,12 @@ const Nav = ({ screen, setScreen, theme, setTheme }: { screen: Screen; setScreen
       </button>
       <div style={{ flex: 1 }} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        {screen !== 'landing' && screen !== 'processing' && (
+        {screen !== 'processing' && (
           <>
             <NBtn active={screen === 'history'} onClick={() => setScreen('history')}><IHistory sz={15} /><span>History</span></NBtn>
-            <NBtn active={false} onClick={() => setScreen('landing')}><IUpload sz={15} /><span>New Upload</span></NBtn>
+            {screen !== 'landing' && (
+              <NBtn active={false} onClick={() => setScreen('landing')}><IUpload sz={15} /><span>New Upload</span></NBtn>
+            )}
           </>
         )}
         <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} style={{ width: 38, height: 38, borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--color-surface-raised)', border: '1px solid var(--color-line)', color: 'var(--color-ink-muted)', cursor: 'pointer' }}>
