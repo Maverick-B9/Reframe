@@ -361,13 +361,16 @@ const ParametersScreen = ({ fileName, preset, setPreset, strength, setStrength, 
   const [seed, setSeed] = useState('42')
   const [prompt, setPrompt] = useState('')
   const [valErr, setValErr] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const pData = PRESETS.find(p => p.id === preset)
   const prevGrad = pData?.gradient ?? 'linear-gradient(135deg,#1a1a2e 0%,#2d3561 100%)'
   const estTime = model === 'turbo' ? '30–60 sec' : model === 'premium' ? '3–6 min' : '1–3 min'
 
   const handleTransform = async () => {
     if (!preset) { setValErr('Please select a style preset to continue.'); return }
+    if (isSubmitting) return;
     setValErr(''); 
+    setIsSubmitting(true);
     
     try {
       const res = await fetch('/api/transform', {
@@ -388,6 +391,7 @@ const ParametersScreen = ({ fileName, preset, setPreset, strength, setStrength, 
       onTransform(data.jobId);
     } catch (e: any) {
       setValErr(e.message);
+      setIsSubmitting(false);
     }
   }
 
@@ -524,8 +528,15 @@ const ParametersScreen = ({ fileName, preset, setPreset, strength, setStrength, 
 
           {/* CTA */}
           <div style={{ padding: '18px 24px 24px', borderTop: '1px solid var(--color-line)' }}>
-            <button onClick={handleTransform} disabled={!preset} style={{ width: '100%', padding: '16px 24px', borderRadius: 14, background: preset ? 'linear-gradient(135deg,#5B10CC,#7B2FFF,#9B5FFF)' : 'rgba(123,47,255,0.22)', border: 'none', color: '#fff', fontSize: 16, fontWeight: 700, cursor: preset ? 'pointer' : 'not-allowed', boxShadow: preset ? '0 0 28px rgba(123,47,255,0.32)' : 'none', transition: 'all 0.2s ease', fontFamily: 'var(--font-sans)' }}>
-              Transform Video
+            <button onClick={handleTransform} disabled={!preset || isSubmitting} style={{ width: '100%', padding: '16px 24px', borderRadius: 14, background: preset ? 'linear-gradient(135deg,#5B10CC,#7B2FFF,#9B5FFF)' : 'rgba(123,47,255,0.22)', border: 'none', color: '#fff', fontSize: 16, fontWeight: 700, cursor: preset && !isSubmitting ? 'pointer' : 'not-allowed', boxShadow: preset && !isSubmitting ? '0 0 28px rgba(123,47,255,0.32)' : 'none', transition: 'all 0.2s ease', fontFamily: 'var(--font-sans)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: isSubmitting ? 0.7 : 1 }}>
+              {isSubmitting ? (
+                <>
+                  <svg className="animate-spin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                  </svg>
+                  Processing...
+                </>
+              ) : 'Transform Video'}
             </button>
             <div style={{ textAlign: 'center', marginTop: 9, fontSize: 12, color: 'var(--color-ink-faint)' }}>
               Estimated time: <span style={{ color: 'var(--color-ink-muted)', fontWeight: 500 }}>{estTime}</span>
