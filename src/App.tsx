@@ -797,7 +797,7 @@ const HistoryScreen = ({ onViewResult, onResumeProcessing, onNewUpload, showToas
     try {
       const res = await fetch('/api/history')
       const data = await res.json()
-      if (data.success) setHistoryList(data.jobs)
+      if (data.success && Array.isArray(data.jobs)) setHistoryList(data.jobs)
     } catch (e) {
       console.error(e)
     }
@@ -807,7 +807,7 @@ const HistoryScreen = ({ onViewResult, onResumeProcessing, onNewUpload, showToas
     fetchHistory()
   }, [])
   
-  const filtered = historyList.filter(it => filter === 'all' || it.status === filter)
+  const filtered = Array.isArray(historyList) ? historyList.filter(it => filter === 'all' || it.status === filter) : []
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--color-canvas)', paddingTop: 60 }}>
@@ -876,13 +876,13 @@ const HistoryScreen = ({ onViewResult, onResumeProcessing, onNewUpload, showToas
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ width: 26, height: 18, borderRadius: 5, background: PRESETS.find(p => p.id === item.preset)?.gradient ?? '#333', flexShrink: 0 }} />
-                        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', textTransform: 'capitalize' }}>{item.preset.replace('-', ' ')}</span>
+                        <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--color-ink)', textTransform: 'capitalize' }}>{(item.preset || 'unknown').replace('-', ' ')}</span>
                       </div>
                       <StatusBadge status={item.status} />
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5, marginBottom: 10 }}>
-                      {[`Strength ${item.strength}`, item.model].map(t => (
-                        <span key={t} className="font-mono-custom" style={{ padding: '2px 8px', borderRadius: 5, background: 'var(--color-surface-high)', fontSize: 10, color: 'var(--color-ink-faint)', letterSpacing: '0.05em', textTransform: 'uppercase', border: '1px solid var(--color-line)' }}>{t}</span>
+                      {[`Strength ${item.strength || 0}`, item.model || 'Unknown'].map((t, idx) => (
+                        <span key={idx} className="font-mono-custom" style={{ padding: '2px 8px', borderRadius: 5, background: 'var(--color-surface-high)', fontSize: 10, color: 'var(--color-ink-faint)', letterSpacing: '0.05em', textTransform: 'uppercase', border: '1px solid var(--color-line)' }}>{t}</span>
                       ))}
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
