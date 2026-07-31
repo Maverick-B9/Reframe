@@ -16,15 +16,36 @@ app.use(express.json());
 
 import mongoose from 'mongoose';
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 5000,
-  tlsAllowInvalidCertificates: true
-})
-  .then(() => console.log('Connected to real MongoDB Atlas instance'))
-  .catch(err => {
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) {
+    console.log('=> using existing database connection');
+    return;
+  }
+  
+  if (!process.env.MONGODB_URI) {
+    console.error('ERROR: MONGODB_URI is undefined. Vercel environment variables are missing!');
+    return;
+  }
+
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+      tlsAllowInvalidCertificates: true
+    });
+    isConnected = db.connections[0].readyState === 1;
+    console.log('Connected to real MongoDB Atlas instance');
+  } catch (err) {
     console.error('Failed to connect to MongoDB Atlas!', err.message);
-  });
+  }
+};
+
+// Add a middleware to ensure connection before handling API routes
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 const JobSchema = new mongoose.Schema({
   id: { type: String, required: true, unique: true },
