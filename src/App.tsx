@@ -121,9 +121,9 @@ const Toast = ({ message, type = 'success', onClose }: { message: string; type?:
 }
 
 // ─── Status badge ─────────────────────────────────────────────────────────────
-const StatusBadge = ({ status }: { status: 'complete' | 'processing' | 'failed' }) => {
-  const m = { complete: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', c: '#10B981', label: 'Complete' }, processing: { bg: 'rgba(123,47,255,0.12)', border: 'rgba(123,47,255,0.3)', c: '#9B5FFF', label: 'Processing' }, failed: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', c: '#EF4444', label: 'Failed' } }
-  const s = m[status]
+const StatusBadge = ({ status }: { status: 'complete' | 'processing' | 'failed' | 'pending' | string }) => {
+  const m: Record<string, any> = { complete: { bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.3)', c: '#10B981', label: 'Complete' }, processing: { bg: 'rgba(123,47,255,0.12)', border: 'rgba(123,47,255,0.3)', c: '#9B5FFF', label: 'Processing' }, failed: { bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.3)', c: '#EF4444', label: 'Failed' }, pending: { bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.3)', c: '#F59E0B', label: 'Pending' } }
+  const s = m[status] || m.pending
   return <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600, background: s.bg, border: `1px solid ${s.border}`, color: s.c, fontFamily: 'var(--font-mono)', letterSpacing: '0.04em', textTransform: 'uppercase' }}><span style={{ width: 5, height: 5, borderRadius: '50%', background: s.c, boxShadow: `0 0 5px ${s.c}` }} />{s.label}</span>
 }
 
